@@ -76,7 +76,7 @@ class Segment {
         }
         if (this.flower) this.flower.grow();
 
-        if (!growing && round(this.c * ROUND_G_S) == 0) return [0, anm];
+        if (!growing && round(this.c * T.ROUND_G_S) == 0) return [0, anm];
         else if (growing && this.c == this.l) return [res, anm];
         return [1, anm];
     }
