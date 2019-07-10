@@ -9,11 +9,11 @@ class Tree {
         this.SEGMENT_COLOR = [80, 20, 10];
 
         /** minimum width length for segment to branch */
-        this.GROWTH_CAP = 1;
+        this.GROWTH_CAP = 0.25;
         /** first segment's width */
         this.INITIAL_W = 12;
         /** first segment's length */
-        this.INITIAL_L = 12;
+        this.INITIAL_L = 25;
         // initial conditions
 
         this.FLOWER_MIN = 5;
@@ -33,7 +33,7 @@ class Tree {
         /** [0,1] factor of PI each branch randomly deviates */
         this.GROW_BEND = 0.5;
         /** [0,1] branch width is current times this factor */
-        this.WIDTH_DECAY = 0.97;
+        this.WIDTH_DECAY = 0.95;
         /** [0,1] branch length is current times this factor */
         this.LENGTH_DECAY = 0.97 //99;
         // grow/wilt constants
@@ -43,7 +43,7 @@ class Tree {
         /** [0,90*BEND] quantized steps of branch random deviation */
         this.BRANCH_BEND_QUAN = 1 //60;
         /** [0,1) probability > 1 branch sprouts when a segment fully grown */
-        this.BRANCH_PROB = 0.07;
+        this.BRANCH_PROB = 0.09;
         // branch consts
 
         /** [0,1] ease factor to spread out maximally */
@@ -53,7 +53,7 @@ class Tree {
         /** [0,1] scale by random factor */
         this.LENGTH_RANDOMOFF = 0.5;
         /** [0,1] scale factor */
-        this.LENGTH_SCALE = 1 //0.999;
+        this.LENGTH_SCALE = 1;//0.999;
         // animation consts
     }
 
@@ -148,6 +148,8 @@ class ScaryFruitTree extends Tree {
             this.SPREAD_RATE = 0;
         } else if (i == 0 && this.GROWTH_RATE < 0) {
             this.root.reset();
+            this.root.w = this.INITIAL_W;
+            this.root.l = this.INITIAL_L;
             this.GROWTH_RATE *= -1;
         }
         return [i,j];
