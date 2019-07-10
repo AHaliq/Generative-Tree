@@ -1,7 +1,5 @@
 class Tree {
     constructor() {
-        this.tmr = 120;
-        
         /** rounding accuracy for animation angle in radians */
         this.ROUND_A_S = 1000;
         /** rounding accuracy for growth/wilt in pixels */
@@ -114,7 +112,30 @@ class Tree {
     }
 
     grow() {
-        let [i, j] = this.root.grow();
+        return this.root.grow();
+    }
+
+    render() {
+        noStroke();
+        beginShape();
+        this.root.render();
+        fill(...this.SEGMENT_COLOR);
+        endShape();
+    }
+
+    makeFlower(x, y) {
+        return new Flower(x, y, this.FLOWER_GROW, random(this.FLOWER_MIN, this.FLOWER_MAX), this.FLOWER_COLOR);
+    }
+}
+
+class ScaryFruitTree extends Tree {
+    constructor() {
+        super();
+        this.tmr = 120;
+    }
+
+    grow() {
+        let [i,j] = super.grow();
         if (i == 2 && j == 0 && this.SPREAD_RATE == 0) {
             if (this.tmr == 0) {
                 this.SPREAD_RATE = 0.25;
@@ -130,18 +151,10 @@ class Tree {
         return [i,j];
     }
 
-    render() {
-        noStroke();
-        beginShape();
-        this.root.render();
-        fill(...this.SEGMENT_COLOR);
-        endShape();
+    makeFlower() {
+        let f = super.makeFlower();
+        f.col = f.col.map((v) => v * (0.5 + random()));
+        return f;
     }
 
-    makeFlower(x, y) {
-        return new Flower(x, y, this.FLOWER_GROW,
-            random(this.FLOWER_MIN, this.FLOWER_MAX),
-            this.FLOWER_COLOR.map((v) => v * (0.5 + random()))
-        );
-    }
 }

@@ -6,7 +6,7 @@ let trees = [];
 function setup() {
   createCanvas(windowWidth, windowHeight);
   windowResized();
-  trees.push(new Tree());
+  trees.push(new ScaryFruitTree());
   trees[0].init(width * 0.5, BBND - BORDER);
 }
 
