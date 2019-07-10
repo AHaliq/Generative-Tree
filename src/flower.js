@@ -24,7 +24,8 @@ class Flower {
         this.x += this.xvel;
         this.t += 0.1;
         this.alpha -= this.fade;
-        if (this.x > RBND || this.y > BBND || this.x < BORDER || this.y < BORDER) this.alpha = 0;
+        //if (this.x > RBND || this.y > BBND || this.x < BORDER || this.y < BORDER) this.alpha = 0;
+        if (this.x > width || this.y > height) this.alpha = 0;
     }
     render() {
         noStroke();

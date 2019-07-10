@@ -8,6 +8,10 @@ class Tree {
         this.FLOWER_COLOR = [255, 100, 100];
         this.SEGMENT_COLOR = [80, 20, 10];
 
+        this.VOLUME_TGT = 40000;
+        this.VOLUME_CUR = 0;
+        // volume
+
         /** minimum width length for segment to branch */
         this.GROWTH_CAP = 0.25;
         /** first segment's width */
@@ -19,7 +23,7 @@ class Tree {
         this.FLOWER_MIN = 5;
         this.FLOWER_MAX = 10;
         /** [0,1] probability a segment has flowers */
-        this.FLOWER_PROB = 0.2;
+        this.FLOWER_PROB = 1//0.2;
         /** [0,1] ease factor for flower to bloom fully */
         this.FLOWER_GROW = 0.2;
         // flower consts
@@ -140,13 +144,15 @@ class ScaryFruitTree extends Tree {
         let [i,j] = super.grow();
         if (i == 2 && j == 0 && this.SPREAD_RATE == 0) {
             if (this.tmr == 0) {
-                this.SPREAD_RATE = 0.25;
+                //this.SPREAD_RATE = 0.25;
+                this.GROWTH_RATE *= -1;
                 this.tmr = 120;
             } else this.tmr--;
         } else if (i == 2 && j == 0 && this.SPREAD_RATE > 0) {
             this.GROWTH_RATE *= -1;
             this.SPREAD_RATE = 0;
         } else if (i == 0 && this.GROWTH_RATE < 0) {
+            this.VOLUME_CUR = 0;
             this.root.reset();
             this.root.w = this.INITIAL_W;
             this.root.l = this.INITIAL_L;
@@ -155,8 +161,8 @@ class ScaryFruitTree extends Tree {
         return [i,j];
     }
 
-    makeFlower() {
-        let f = super.makeFlower();
+    makeFlower(x,y) {
+        let f = super.makeFlower(x,y);
         f.col = f.col.map((v) => v * (0.5 + random()));
         return f;
     }
