@@ -36,7 +36,7 @@ class Segment {
             anm = 0,
             acap;
         const SRMQ = 2 * T.SPREAD_RATE_MAG / (this.N.length - 1),
-            oldNL = this.N.length;
+            oldNL = this.N.length,
             [px,py] = this.peak;
         [this.N, res] = this.N.reduce(([nn, p], s, i) => {
             s.x = px;
