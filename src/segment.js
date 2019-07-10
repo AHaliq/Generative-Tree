@@ -71,8 +71,7 @@ class Segment {
         let res, anm = 0;
         const SRMQ = 2 * T.SPREAD_RATE_MAG / (this.N.length - 1),
             oldNL = this.N.length,
-            [px, py] = this.peak,
-            tooSmall = this.l < T.GROWTH_CAP || this.w < T.GROWTH_CAP;
+            [px, py] = this.peak;
         [this.N, res] = this.N.reduce(([nn, p], s, i) => {
             s.x = px;
             s.y = py;
@@ -87,32 +86,34 @@ class Segment {
             [], 2
         ]);
         const stopWilt = oldNL > 0 && this.N.length == 0,
-            growing = T.GROWTH_RATE >= 0;
+            growing = T.GROWTH_RATE >= 0,
+            tooSmall =  this.l < T.GROWTH_CAP || this.w < T.GROWTH_CAP;
+        let olddead = this.dead;
 
         if (this.flower && !growing) {
+            if(this.flower.r < this.T.FLOWER_MIN) console.log("PUSHED DUST");
             petals.push(this.flower);
             this.flower = undefined;
-        } else if (this.N.length == 0 && !growing && !stopWilt) {
-            if (Math.random() < T.WILT_PROB) this.c += this.c * T.GROWTH_RATE;
-        } else if (px > RBND || px < BORDER || py > BBND || py < BORDER) {
-            //if (!this.dead && random() < T.FLOWER_PROB && !this.flower) this.flower = T.makeFlower(px, py);
+        } else if (this.N.length == 0 && !growing) {
+            if (!stopWilt && Math.random() < T.WILT_PROB) this.c += this.c * T.GROWTH_RATE;
+        } else if ((px > RBND || px < BORDER || py > BBND || py < BORDER) && this.N.length == 0) {
             this.dead = true;
         } else if (this.c != this.l && !this.dead) {
             this.c += (this.l - this.c) * T.GROWTH_RATE;
             if (round((this.l - this.c) * T.ROUND_G_S) == 0) {
                 this.c = this.l;
-                this.dead = T.VOLUME_CUR >= T.VOLUME_TGT || random() < this.T.DEAD_PROB;
-                if (!this.dead && !tooSmall) {
-                    if (this.N.length == 0) {
-                        this.branch(px, py, random(-T.GROW_BEND_MAG, T.GROW_BEND_MAG));
-                        while (random() < T.BRANCH_PROB)
-                            this.branch(px, py, round(random(-T.BRANCH_BEND_MAG, T.BRANCH_BEND_MAG) / T.BRANCH_BEND_QR) * T.BRANCH_BEND_QR);
-                        return [1, anm];
-                    }
-                } else if (random() < T.FLOWER_PROB) {
-                    this.flower = T.makeFlower(px, py);
+                this.dead = tooSmall || T.VOLUME_CUR >= T.VOLUME_TGT || (growing && random() < this.T.DEAD_PROB);
+                if (!this.dead && this.N.length == 0) {
+                    this.branch(px, py, random(-T.GROW_BEND_MAG, T.GROW_BEND_MAG));
+                    while (random() < T.BRANCH_PROB)
+                        this.branch(px, py, round(random(-T.BRANCH_BEND_MAG, T.BRANCH_BEND_MAG) / T.BRANCH_BEND_QR) * T.BRANCH_BEND_QR);
+                    return [1, anm];
                 }
             }
+        }
+        if(!olddead && this.dead) {
+            if(random() < T.FLOWER_PROB) this.flower = T.makeFlower(px,py);
+            olddead = this.dead;
         }
         if (this.flower) this.flower.grow();
 
@@ -159,4 +160,9 @@ class Segment {
 }
 
 //TODO flowers are being pushed despite not yet trigger reverse growth due to flower creation on dead
+    // DONE its due to one frame creation due to stopWilt mechanism
 //TODO HANGS when collide ceiling and short due to matured branching code
+
+// consider mature branch attempts start from root up
+// can we do this from within grow
+// or do we need another recursive function after grow?

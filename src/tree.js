@@ -13,7 +13,7 @@ class Tree {
         // volume
 
         /** minimum width length for segment to branch */
-        this.GROWTH_CAP = 0.25;
+        this.GROWTH_CAP = 0.5//25;
         /** first segment's width */
         this.INITIAL_W = 12;
         /** first segment's length */
