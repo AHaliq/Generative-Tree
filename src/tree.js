@@ -26,6 +26,8 @@ class Tree {
 
         /** (0,1] probability wilting will occur on -ve GROWTH_RATE */
         this.WILT_PROB = 0.5;
+        /** [0,1] probability segment turns to stub and stops growing */
+        this.DEAD_PROB = 0//0.01;
         /** [-1,1] negative wilts, positive grows */
         this.GROWTH_RATE = 1; //0.8;
         /** [0,1] factor of PI each branch randomly deviates */

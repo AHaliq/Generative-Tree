@@ -12,7 +12,7 @@ class Segment {
         this.flower = undefined;
         this.c = 0;
         this.N = [];
-        this.matured = false;
+        this.dead = false;
     }
     get peak() {
         return [
@@ -56,28 +56,31 @@ class Segment {
             this.flower = undefined;
         } else if (this.N.length == 0 && !growing && !stopWilt) {
             if (Math.random() < T.WILT_PROB) this.c += this.c * T.GROWTH_RATE;
-        } else if (this.x > RBND || this.x < BORDER || this.y > BBND || this.y < BORDER) {
-            this.c = this.l
-        } else if (this.c != this.l) {
+        /*} else if (px> RBND || px < BORDER || py > BBND || py < BORDER) {
+            this.dead = true;*/
+        } else if (this.c != this.l && !this.dead) {
             this.c += (this.l - this.c) * T.GROWTH_RATE;
             if (round((this.l - this.c) * T.ROUND_G_S) == 0) {
                 this.c = this.l;
-                if (!(this.l < T.GROWTH_CAP || this.w < T.GROWTH_CAP)) {
-                    if(this.N.length == 0) {
-                        this.branch(px,py,random(-T.GROW_BEND_MAG, T.GROW_BEND_MAG));
-                        while (random() < T.BRANCH_PROB)
-                            this.branch(px,py,round(random(-T.BRANCH_BEND_MAG, T.BRANCH_BEND_MAG) / T.BRANCH_BEND_QR) * T.BRANCH_BEND_QR);
-                        return [1, anm];
+                this.dead = random() < this.T.DEAD_PROB
+                if(!this.dead) {
+                    if (!(this.l < T.GROWTH_CAP || this.w < T.GROWTH_CAP)) {
+                        if(this.N.length == 0) {
+                            this.branch(px,py,random(-T.GROW_BEND_MAG, T.GROW_BEND_MAG));
+                            while (random() < T.BRANCH_PROB)
+                                this.branch(px,py,round(random(-T.BRANCH_BEND_MAG, T.BRANCH_BEND_MAG) / T.BRANCH_BEND_QR) * T.BRANCH_BEND_QR);
+                            return [1, anm];
+                        }
+                    } else if (random() < T.FLOWER_PROB) {
+                        this.flower = T.makeFlower(px, py);
                     }
-                } else if (random() < T.FLOWER_PROB) {
-                    this.flower = T.makeFlower(px, py);
                 }
             }
         }
         if (this.flower) this.flower.grow();
 
         if (!growing && round(this.c * T.ROUND_G_S) == 0) return [0, anm];
-        else if (growing && this.c == this.l) return [res, anm];
+        else if (growing && (this.c == this.l || this.dead)) return [res, anm];
         return [1, anm];
     }
     branch(x,y,na) {
