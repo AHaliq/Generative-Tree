@@ -144,8 +144,8 @@ class ScaryFruitTree extends Tree {
         let [i,j] = super.grow();
         if (i == 2 && j == 0 && this.SPREAD_RATE == 0) {
             if (this.tmr == 0) {
-                //this.SPREAD_RATE = 0.25;
-                this.GROWTH_RATE *= -1;
+                this.SPREAD_RATE = 0.25;
+                //this.GROWTH_RATE *= -1;
                 this.tmr = 120;
             } else this.tmr--;
         } else if (i == 2 && j == 0 && this.SPREAD_RATE > 0) {
