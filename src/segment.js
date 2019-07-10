@@ -81,7 +81,7 @@ class Segment {
         return [1, anm];
     }
     branch(x,y,na) {
-        this.N.push(new Segment(x, y, this.a + na, this.w * T.WIDTH_DECAY, this.l * T.LENGTH_DECAY, this.T));
+        this.N.push(new Segment(x, y, this.a + na, this.w * this.T.WIDTH_DECAY, this.l * this.T.LENGTH_DECAY, this.T));
     }
     realign() {
         this.N.map((s) => { [s.x, s.y] = this.peak; s.realign(); });
