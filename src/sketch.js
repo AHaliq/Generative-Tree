@@ -33,6 +33,7 @@ function draw() {
   }, []);
   
   trees.map((t) => t.grow());
+  trees.map((t) => t.render());
   /*let [i,j] = s.grow();
   if(i==2 && j == 0 && SPREAD_RATE == 0) { 
     if(tmr == 0) {

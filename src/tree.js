@@ -120,9 +120,9 @@ class Tree {
     }
 
     makeFlower(x,y) {
-        return new Flower(x, y,
+        return new Flower(x, y, this.FLOWER_GROW, 
             random(this.FLOWER_MIN, this.FLOWER_MAX),
-            T.FLOWER_COLOR.map((v) => v * (0.5 + random()))
+            this.FLOWER_COLOR.map((v) => v * (0.5 + random()))
         );
     }
 }
