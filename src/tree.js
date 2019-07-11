@@ -23,7 +23,7 @@ class Tree {
         this.FLOWER_MIN = 5;
         this.FLOWER_MAX = 10;
         /** [0,1] probability a segment has flowers */
-        this.FLOWER_PROB = 1//0.2;
+        this.FLOWER_PROB = 0.2;
         /** [0,1] ease factor for flower to bloom fully */
         this.FLOWER_GROW = 0.2;
         // flower consts
@@ -39,13 +39,13 @@ class Tree {
         /** [0,1] branch width is current times this factor */
         this.WIDTH_DECAY = 0.95;
         /** [0,1] branch length is current times this factor */
-        this.LENGTH_DECAY = 0.97 //99;
+        this.LENGTH_DECAY = 0.97;
         // grow/wilt constants
 
         /** [0,1] factor of PI each branch if >= 2 randomly deviates */
-        this.BRANCH_BEND = 1 //0.25;
+        this.BRANCH_BEND = 0.5;
         /** [0,90*BEND] quantized steps of branch random deviation */
-        this.BRANCH_BEND_QUAN = 1 //60;
+        this.BRANCH_BEND_QUAN = 1;
         /** [0,1) probability > 1 branch sprouts when a segment fully grown */
         this.BRANCH_PROB = 0.09;
         // branch consts
@@ -167,5 +167,44 @@ class ScaryFruitTree extends Tree {
         f.col = f.col.map((v) => v * (0.5 + random()));
         return f;
     }
+}
 
+class IsoTree extends Tree {
+    constructor() {
+        super();
+        this.tmr = 120;
+        this.SEGMENT_COLOR = [125,115,30]
+        this.VOLUME_TGT = 60000;
+        this.INITIAL_W = 2;
+        this.INITIAL_L = 10;
+        this.FLOWER_PROB = 0;
+        this.WILT_PROB = 1;
+        this.DEAD_PROB = 0;
+        this.GROW_BEND = 0;
+        this.WIDTH_DECAY = 1;
+        this.LENGTH_DECAY = 1;
+        this.BRANCH_BEND = 1;
+        this.BRANCH_BEND_QUAN = 60;
+        this.BRANCH_PROB = 0.055;
+    }
+    grow() {
+        let [i,j] = super.grow();
+        if (i == 2 && j == 0 && this.STRAIGHTEN_RATE == 0) {
+            if (this.tmr == 0) {
+                this.STRAIGHTEN_RATE = 0.1;
+                this.GROWTH_RATE = -1;
+                //this.root.resize(true, 0.5);
+                this.tmr = 120;
+            } else this.tmr--;
+        } else if (i == 2 && j == 0 && this.STRAIGHTEN_RATE > 0) {
+            this.GROWTH_RATE = -1;
+            this.STRAIGHTEN_RATE = 0;
+        } else if (i == 0 && this.GROWTH_RATE < 0) {
+            this.STRAIGHTEN_RATE = 0;
+            this.VOLUME_CUR = 0;
+            this.root.reset();
+            this.GROWTH_RATE = 1;
+        }
+        return [i,j]
+    }
 }
