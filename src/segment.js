@@ -54,20 +54,18 @@ class Segment {
         }
         return [this._oldpx, this._oldpy];
     }
-    resize() {
-        let lr = 1 + random(-this.T.LENGTH_RO_MAG, this.T.LENGTH_RO_MAG);
-        this.T.VOLUME_CUR -= this.l;
+    resize(fix, scale = 1, r = 0) {
+        let lr = scale + random(-r, r);
+        if(!fix) this.T.VOLUME_CUR -= this.l;
         this.l *= lr;
-        this.T.VOLUME_CUR += this.l;
-        this.N.map((s) => s.resize());
+        if(!fix) this.T.VOLUME_CUR += this.l;
+        this.N.map((s) => s.resize(fix, scale, r));
     }
     /**
      * return   0 - wilted, 1 - wilting/growing, 2 - grown
      */
     grow() {
         const T = this.T;
-        //this.l *= T.LENGTH_SCALE;
-        //this.c *= T.LENGTH_SCALE;
         let res, anm = 0;
         const SRMQ = 2 * T.SPREAD_RATE_MAG / (this.N.length - 1),
             oldNL = this.N.length,
@@ -96,7 +94,7 @@ class Segment {
         } else if (this.N.length == 0 && !growing) {
             if (!stopWilt && Math.random() < T.WILT_PROB) this.c += this.c * T.GROWTH_RATE;
         } else if ((px > T.RBRD || px < T.LBRD || py > T.BBRD || py < T.TBRD) && this.N.length == 0) {
-            this.dead = true;
+           this.dead = true;
         } else if (this.c != this.l && !this.dead) {
             this.c += (this.l - this.c) * T.GROWTH_RATE;
             if (round((this.l - this.c) * T.ROUND_G_S) == 0) {

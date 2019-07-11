@@ -56,8 +56,6 @@ class Tree {
         this.STRAIGHTEN_RATE = 0 //0.02;
         /** [0,1] scale by random factor */
         this.LENGTH_RANDOMOFF = 0.5;
-        /** [0,1] scale factor */
-        this.LENGTH_SCALE = 1;//0.999;
         // animation consts
     }
 
@@ -146,13 +144,13 @@ class ScaryFruitTree extends Tree {
         let [i,j] = super.grow();
         if (i == 2 && j == 0 && this.SPREAD_RATE == 0) {
             if (this.tmr == 0) {
-                //this.SPREAD_RATE = 0.25;
-                this.GROWTH_RATE *= -1;
-                console.log(this.VOLUME_CUR);
+                this.SPREAD_RATE = 0.25;
+                this.GROWTH_RATE = 0.01;
+                //this.root.resize(true, 0.5);
                 this.tmr = 120;
             } else this.tmr--;
         } else if (i == 2 && j == 0 && this.SPREAD_RATE > 0) {
-            this.GROWTH_RATE *= -1;
+            this.GROWTH_RATE = -1;
             this.SPREAD_RATE = 0;
         } else if (i == 0 && this.GROWTH_RATE < 0) {
             this.VOLUME_CUR = 0;
