@@ -6,7 +6,7 @@ let trees = [];
 function setup() {
   createCanvas(windowWidth, windowHeight);
   windowResized();
-  trees.push(new IsoTree());
+  trees.push(new ScaryFruitTree());
   trees[0].LBRD = trees[0].TBRD = BORDER;
   trees[0].RBRD = RBRD;
   trees[0].BBRD = BBRD;

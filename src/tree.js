@@ -137,6 +137,7 @@ class Tree {
 class ScaryFruitTree extends Tree {
     constructor() {
         super();
+        this.ROUND_A_S = 25;
         this.tmr = 120;
     }
 
@@ -174,15 +175,15 @@ class IsoTree extends Tree {
         super();
         this.tmr = 120;
         this.SEGMENT_COLOR = [125,115,30]
-        this.VOLUME_TGT = 60000;
-        this.INITIAL_W = 2;
-        this.INITIAL_L = 10;
+        this.VOLUME_TGT = 50000;
+        this.INITIAL_W = 1;
+        this.INITIAL_L = 20;
         this.FLOWER_PROB = 0;
         this.WILT_PROB = 1;
         this.DEAD_PROB = 0;
         this.GROW_BEND = 0;
         this.WIDTH_DECAY = 1;
-        this.LENGTH_DECAY = 1;
+        this.LENGTH_DECAY = 0.986;
         this.BRANCH_BEND = 1;
         this.BRANCH_BEND_QUAN = 60;
         this.BRANCH_PROB = 0.055;
@@ -193,7 +194,6 @@ class IsoTree extends Tree {
             if (this.tmr == 0) {
                 this.STRAIGHTEN_RATE = 0.1;
                 this.GROWTH_RATE = -1;
-                //this.root.resize(true, 0.5);
                 this.tmr = 120;
             } else this.tmr--;
         } else if (i == 2 && j == 0 && this.STRAIGHTEN_RATE > 0) {
