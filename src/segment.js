@@ -91,12 +91,11 @@ class Segment {
         let olddead = this.dead;
 
         if (this.flower && !growing) {
-            if(this.flower.r < this.T.FLOWER_MIN) console.log("PUSHED DUST");
             petals.push(this.flower);
             this.flower = undefined;
         } else if (this.N.length == 0 && !growing) {
             if (!stopWilt && Math.random() < T.WILT_PROB) this.c += this.c * T.GROWTH_RATE;
-        } else if ((px > RBND || px < BORDER || py > BBND || py < BORDER) && this.N.length == 0) {
+        } else if ((px > T.RBRD || px < T.LBRD || py > T.BBRD || py < T.TBRD) && this.N.length == 0) {
             this.dead = true;
         } else if (this.c != this.l && !this.dead) {
             this.c += (this.l - this.c) * T.GROWTH_RATE;
@@ -105,8 +104,7 @@ class Segment {
                 this.dead = tooSmall || T.VOLUME_CUR >= T.VOLUME_TGT || (growing && random() < this.T.DEAD_PROB);
                 if (!this.dead && this.N.length == 0) {
                     this.branch(px, py, random(-T.GROW_BEND_MAG, T.GROW_BEND_MAG));
-                    while (random() < T.BRANCH_PROB)
-                        this.branch(px, py, round(random(-T.BRANCH_BEND_MAG, T.BRANCH_BEND_MAG) / T.BRANCH_BEND_QR) * T.BRANCH_BEND_QR);
+                    this.bifurcate();
                     return [1, anm];
                 }
             }
@@ -117,20 +115,31 @@ class Segment {
         }
         if (this.flower) this.flower.grow();
 
-        /*if (growing && !tooSmall && res == 2 && T.VOLUME_CUR < T.VOLUME_TGT) {
-            while (random() < T.BRANCH_PROB * this.w * this.l) {
-                if(this.flower) this.flower = undefined;
-                this.branch(px, py, round(random(-T.BRANCH_BEND_MAG, T.BRANCH_BEND_MAG) / T.BRANCH_BEND_QR) * T.BRANCH_BEND_QR);
-                res = 1;
-            }
-        }*/
-
         if (!growing && round(this.c * T.ROUND_G_S) == 0) return [0, anm];
         else if (growing && (this.c == this.l || this.dead)) return [res, anm];
         return [1, anm];
     }
     branch(x, y, na) {
         this.N.push(new Segment(x, y, this.a + na, this.w * this.T.WIDTH_DECAY, this.l * this.T.LENGTH_DECAY, this.T));
+    }
+    bifurcate() {
+        const T = this.T, [px,py] = this.peak;
+        let res = 2;
+        while (random() < T.BRANCH_PROB) {
+            res = 1;
+            this.branch(px,py, round(
+                random(-T.BRANCH_BEND_MAG, T.BRANCH_BEND_MAG) /
+                T.BRANCH_BEND_QR
+            ) * T.BRANCH_BEND_QR);
+        }
+        return res;
+    }
+    forcegrow() {
+        const T = this.T;
+        if(T.VOLUME_CUR < T.VOLUME_TGT) {
+            return this.N.reduce((p,s) => p == 1 ? 1 : s.forcegrow(),this.bifurcate());
+        }
+        return 2;
     }
     realign() {
         this.N.map((s) => {
@@ -159,10 +168,4 @@ class Segment {
     }
 }
 
-//TODO flowers are being pushed despite not yet trigger reverse growth due to flower creation on dead
-    // DONE its due to one frame creation due to stopWilt mechanism
-//TODO HANGS when collide ceiling and short due to matured branching code
-
-// consider mature branch attempts start from root up
-// can we do this from within grow
-// or do we need another recursive function after grow?
+//TODO consider bounding while animating

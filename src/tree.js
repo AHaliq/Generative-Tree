@@ -118,7 +118,9 @@ class Tree {
     }
 
     grow() {
-        return this.root.grow();
+        let [s,a] = this.root.grow();
+        while(s == 2 && this.VOLUME_CUR < this.VOLUME_TGT) s = this.root.forcegrow();
+        return [s,a];
     }
 
     render() {
@@ -144,8 +146,9 @@ class ScaryFruitTree extends Tree {
         let [i,j] = super.grow();
         if (i == 2 && j == 0 && this.SPREAD_RATE == 0) {
             if (this.tmr == 0) {
-                this.SPREAD_RATE = 0.25;
-                //this.GROWTH_RATE *= -1;
+                //this.SPREAD_RATE = 0.25;
+                this.GROWTH_RATE *= -1;
+                console.log(this.VOLUME_CUR);
                 this.tmr = 120;
             } else this.tmr--;
         } else if (i == 2 && j == 0 && this.SPREAD_RATE > 0) {

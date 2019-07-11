@@ -1,4 +1,4 @@
-let BORDER = 50, RBND, BBND, OLDW;
+let BORDER = 50, RBRD, BBRD, OLDW;
 
 let petals = [];
 let trees = [];
@@ -6,25 +6,33 @@ let trees = [];
 function setup() {
   createCanvas(windowWidth, windowHeight);
   windowResized();
-  trees.push(new ScaryFruitTree());
-  trees[0].init(width * 0.5, BBND - BORDER);
+  trees.push(new ScaryFruitTree(BORDER, BORDER, RBRD, BBRD));
+  trees[0].LBRD = trees[0].TBRD = BORDER;
+  trees[0].RBRD = RBRD;
+  trees[0].BBRD = BBRD;
+  trees[0].init(width * 0.5, BBRD - BORDER);
 }
 
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
-  RBND = width - BORDER;
-  BBND = height - BORDER;
-  trees.map((t) => t.reposition(t.x / OLDW * width, BBND - BORDER));
+  RBRD = width - BORDER;
+  BBRD = height - BORDER;
+  trees.map((t) => {
+    t.reposition(t.x / OLDW * width, BBRD - BORDER);
+    t.RBRD = RBRD;
+    t.BBRD = BBRD;
+    return t;
+  });
   OLDW = width;
 }
 
 function draw() {
   background(220);
   stroke(200);
-  line(BORDER,BORDER,RBND,BORDER);
-  line(RBND,BORDER,RBND,BBND);
-  line(RBND,BBND,BORDER,BBND);
-  line(BORDER,BBND,BORDER,BORDER);
+  line(BORDER,BORDER,RBRD,BORDER);
+  line(RBRD,BORDER,RBRD,BBRD);
+  line(RBRD,BBRD,BORDER,BBRD);
+  line(BORDER,BBRD,BORDER,BORDER);
 
   
   trees.map((t) => t.grow());
@@ -33,6 +41,7 @@ function draw() {
   petals = petals.reduce((ps,p) => {
     p.render();
     p.fall();
+    if(p.x > RBRD || p.y > BBRD) p.alpha = 0;
     return p.alpha <= 0 ? ps : [...ps, p];
   }, []);
   
