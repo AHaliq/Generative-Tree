@@ -138,6 +138,9 @@ class ScaryFruitTree extends Tree {
     constructor() {
         super();
         this.ROUND_A_S = 25;
+        this.VOLUME_TGT = 20000;
+        //this.BRANCH_PROB = 0.2;
+        //this.WIDTH_DECAY = 0.93;
         this.tmr = 120;
     }
 
