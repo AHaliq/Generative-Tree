@@ -21,11 +21,11 @@ class Node_Core {
         this.wchanged = true;
     }
     get t() {
-        if(this._o.changed || this._d.changed) {
-            this._o.changed = false;
-            if(this._d.changed) this.dr;
-            this._t.x = this._o.x + this._d.x;
-            this._t.y = this._o.y + this._d.y;
+        if(this.o.changed || this.d.changed) {
+            this.o.changed = false;
+            if(this.d.changed) this.dr;
+            this._t.x = this.o.x + this.d.x;
+            this._t.y = this.o.y + this.d.y;
         }
         return this._t;
     }
@@ -33,7 +33,7 @@ class Node_Core {
         if(this.d.changed || this.wchanged) {
             this.d.changed = false;
             this.wchanged = false;
-            this._dr.a = this._d.a + HALF_PI;
+            this._dr.a = this.d.a + HALF_PI;
             this._dr.m = this._w;
         }
         return this._dr;
@@ -46,10 +46,14 @@ class Node_Core {
         this._rw.y = this.o.y + this._dr.y;
     }
     get lw() {
+        if(this.o.changed || this.d.changed) this.t;
+        if(this.wchanged) this.dr;
         if(this.dr.changed) this.updateWings();
         return this._lw;
     }
     get rw() {
+        if(this.o.changed || this.d.changed) this.t;
+        if(this.wchanged) this.dr;
         if(this.dr.changed) this.updateWings();
         return this._rw;
     }

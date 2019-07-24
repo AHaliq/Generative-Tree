@@ -96,4 +96,22 @@ class Node_Vector {
         this.x += v.x;
         this.y += v.y;
     }
+
+    static neg(v) {
+        return new Node_Vector(v.x * -1, v.y * -1);
+    }
+
+    neg() {
+        this.x *= -1;
+        this.y *= -1;
+    }
+
+    static sub(v1,v2) {
+        return new Node_Vector(v1.x - v2.x, v1.y - v2.y);
+    }
+
+    sub(v) {
+        this.x -= v.x;
+        this.y -= v.y;
+    }
 }
