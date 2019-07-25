@@ -9,6 +9,9 @@ function setup() {
     case 'flower':
       //o = new FlowerSetup(BORDER);
       break;
+    case 'primitive':
+      o = new PrimitiveSetup(BORDER);
+      break;
     default: // block
       o = new BlockSetup(BORDER);
       break;
@@ -20,7 +23,7 @@ function draw() {
   noFill();
   stroke(150);
   rect(BORDER, BORDER, B_WDT, B_HGT);
-  //o.algo();
+  o.algo();
 }
 // webpack components
 // do flower tree
