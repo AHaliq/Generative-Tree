@@ -1,0 +1,22 @@
+export const windowWidth = p5.windowWidth;
+export const windowHeight = p5.windowHeight;
+export const width = p5.width;
+export const height = p5.height;
+
+export const createCanvas = p5.createCanvas;
+export const background = p5.background;
+export const noFill = p5.noFill;
+export const stroke = p5.stroke;
+export const rect = p5.rect;
+export const noStroke = p5.noStroke;
+export const round = p5.round;
+export const beginShape = p5.beginShape;
+export const vertex = p5.vertex;
+export const endShape = p5.endShape;
+export const color = p5.color;
+export const fill = p5.fill;
+export const lerpColor = p5.lerpColor;
+export const radians = p5.radians;
+export const random = p5.random;
+export const ellipse = p5.ellipse;
+export const HALF_PI = p5.HALF_PI;

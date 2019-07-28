@@ -1,5 +1,8 @@
-class BlockSetup {
-    constructor(border) {
+import T_Block from '../tree/tree_block';
+
+export default class BlockSetup {
+    constructor(p, border) {
+        this.p = p;
         this.BORDER = border;
         this.trees = [];
         this.setups = [{
@@ -34,7 +37,7 @@ class BlockSetup {
     }
 
     makeNew() {
-        const choice = random(this.totWeight);
+        const choice = this.p.random(this.totWeight);
         let obj;
         for (const o of this.setups) {
             if (choice < o.WEIGHT) {
@@ -42,7 +45,7 @@ class BlockSetup {
                 break;
             }
         }
-        return new T_Block(width * 0.5, height * 0.5, radians(random([0, 90, 180, 270])), obj.l, obj.w, obj.gr, 180 / obj.bd, color(...obj.clr), this.BORDER);
+        return new T_Block(this.p, this.p.width * 0.5, this.p.height * 0.5, this.p.radians(this.p.random([0, 90, 180, 270])), obj.l, obj.w, obj.gr, 180 / obj.bd, this.p.color(...obj.clr), this.BORDER);
     }
 
     algo() {
