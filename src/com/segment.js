@@ -9,7 +9,7 @@ export function SegBehaviour(s) {
       value: function (b) { behaviours.push(b); }
     },
     step: {
-      value: function () { behaviours.map(x => x()); }
+      value: function () { behaviours.map(x => x(s)); }
     }
   })
 }
