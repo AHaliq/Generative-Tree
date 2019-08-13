@@ -1,20 +1,16 @@
-import Node, { createCore } from '../node/node';
+import { H_SegBaseW } from './segment';
 
-export default class Tree {
-    constructor(p, x, y, a, l, w, lv = {}, sv = {}) {
-        this.p = p;
-        this.root = new Node(this.p,
-            createCore(x, y, a, l, w),
-            { ...lv },
-            { ...sv },
-            [],
-            []
-        );
+export default function (p, b) {
+    let s = H_SegBaseW(p, 0, 0, 0, 50, 10);
+    let t = 0;
+    return function () {
+        p.translate(b.o1.x + b.width * 0.5, b.o1.y + b.height * 0.5);
+        s.d.a = p.atan2(p.mouseY - b.o1.y - b.height / 2, p.mouseX - b.o1.x - b.width / 2);
+        s.r = p.sin(t) * 50;
+        p.ellipse(s.o.x, s.o.y, 10);
+        p.ellipse(s.t.x, s.t.y, 10);
+        p.ellipse(s.rw.x, s.rw.y, 5);
+        p.ellipse(s.lw.x, s.lw.y, 5);
+        t += p.PI / 180;
     }
-    step() {
-        this.root.step();
-    }
-    render() {
-        this.root.render();
-    }
-}
+};
