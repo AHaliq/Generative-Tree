@@ -1,78 +1,95 @@
 /**
- * 
- * @param {SegBase} s 
+ * decorate a segment object with behaviours
+ * @param {SegBase} s
  */
-export function SegBehaviour(s) {
+export function wrapSegBehaviour(s) {
   behaviours = [];
   Object.defineProperties(s, {
     addBehaviour: {
-      value: function (b) { behaviours.push(b); }
+      value: function(b) {
+        behaviours.push(b);
+      },
     },
     step: {
-      value: function () { behaviours.map(x => x(s)); }
-    }
-  })
-}
-
-export function H_SegBaseW(p, x, y, a, m, r) {
-  return SegBaseW(SegBase(p, x, y, a, m), r);
+      value: function() {
+        behaviours.map((x) => x(s));
+      },
+    },
+  });
 }
 
 /**
- * 
- * @param {SegBase} s 
- * @param {Number} r 
+ * Helper shortcut to create SegBaseW
+ * @param {p5js} p
+ * @param {Number} x origin x
+ * @param {Number} y origin y
+ * @param {Number} a displacement angle
+ * @param {Number} m displacement magnitude
+ * @param {Number} r wing radius
+ * @return {SegBaseW}
  */
-export function SegBaseW(s, r) {
+export function makeSegBaseW(p, x, y, a, m, r) {
+  return wrapSegBaseW(makeSegBase(p, x, y, a, m), r);
+}
+
+/**
+ * wraps a SegBase object with wing vectors
+ * @param {SegBase} s
+ * @param {Number} r
+ * @return {SegBaseW}
+ */
+export function wrapSegBaseW(s, r) {
   const p = s._p;
-  let _w = Vec(p, 0, r, false);
-  let _rw, _lw = {};
+  const _w = makeVec(p, 0, r, false);
+  let _rw; let _lw = {};
   let rchanged = true;
-  const updateW = function () {
+  const updateW = function() {
     if (s._tcheck() || rchanged) {
       _w.a = s.d.a + p.HALF_PI;
-      _rw = { x: s.o.x + _w.x, y: s.o.y + _w.y };
-      _lw = { x: s.o.x - _w.x, y: s.o.y - _w.y };
+      _rw = {x: s.o.x + _w.x, y: s.o.y + _w.y};
+      _lw = {x: s.o.x - _w.x, y: s.o.y - _w.y};
       rchanged = false;
     }
-  }
+  };
   Object.defineProperties(s, {
     rw: {
-      get: function () {
+      get: function() {
         s._updateT();
         updateW();
         return _rw;
-      }
+      },
     },
     lw: {
-      get: function () {
+      get: function() {
         s._updateT();
         updateW();
         return _lw;
-      }
+      },
     },
     r: {
-      set: function (v) {
+      set: function(v) {
         _w.m = v;
         rchanged = true;
-      }
-    }
+      },
+    },
   });
   return s;
 }
 
 /**
- * 
- * @param {p5js} p 
- * @param {Number} x 
- * @param {Number} y 
- * @param {Number} a 
- * @param {Number} m 
+ * makes a segment object; origin and target point
+ * @param {p5js} p p5js argument object
+ * @param {Number} x origin x
+ * @param {Number} y origin y
+ * @param {Number} a displacement angle
+ * @param {Number} m displacement magnitude
+ * @return {SegBase}
  */
-export function SegBase(p, x, y, a, m) {
-  let _o = Vec(p, x, y);
-  let _d = Vec(p, a, m, false);
-  let _t = Vec(p);
+export function makeSegBase(p, x, y, a, m) {
+  const _o = makeVec(p, x, y);
+  const _d = makeVec(p, a, m, false);
+  const _t = makeVec(p);
+  /** updates target point */
   function __updateT() {
     if (_o.check() || _d.check()) {
       _t.x = _o.x + _d.x;
@@ -83,16 +100,28 @@ export function SegBase(p, x, y, a, m) {
     _p: p,
     _updateT: __updateT,
     _tcheck: _t.check,
-    get o() { return _o; },
-    get d() { return _d; },
+    get o() {
+      return _o;
+    },
+    get d() {
+      return _d;
+    },
     get t() {
       __updateT();
-      return { x: _t.x, y: _t.y };
-    }
+      return {x: _t.x, y: _t.y};
+    },
   };
 }
 
-export function Vec(p, v1 = 0, v2 = 0, cartesian = true) {
+/**
+ * makes a vector object
+ * @param {p5js} p p5js argument object
+ * @param {Number} v1 x or angle
+ * @param {Number} v2 y or magnitude
+ * @param {Boolean} cartesian determines the quantity v1 and v2 represents
+ * @return {Vec} vector object
+ */
+export function makeVec(p, v1 = 0, v2 = 0, cartesian = true) {
   let upCar = !cartesian;
   let upAng = cartesian;
   let upMag = cartesian;
@@ -148,10 +177,10 @@ export function Vec(p, v1 = 0, v2 = 0, cartesian = true) {
       _m = v;
       upCar = changed = true;
     },
-    check: function () {
-      let s = changed;
+    check: function() {
+      const s = changed;
       changed = false;
       return s;
-    }
+    },
   };
 }
