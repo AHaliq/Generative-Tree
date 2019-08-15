@@ -3,7 +3,7 @@
  * @param {SegBase} s
  */
 export function wrapSegBehaviour(s) {
-  behaviours = [];
+  const behaviours = [];
   Object.defineProperties(s, {
     addBehaviour: {
       value: function(b) {
@@ -70,6 +70,9 @@ export function wrapSegBaseW(s, r) {
       set: function(v) {
         _w.m = v;
         rchanged = true;
+      },
+      get: function() {
+        return _w.m;
       },
     },
   });
