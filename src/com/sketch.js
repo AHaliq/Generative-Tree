@@ -1,7 +1,7 @@
 
 import '../style.scss';
 
-import makeBox from './box';
+import Box from './box';
 import tree from './tree/tree';
 
 const BORDER = 100;
@@ -19,7 +19,7 @@ new p5((p) => {
 
   p.setup = () => {
     p.createCanvas(p.windowWidth, p.windowHeight);
-    b = makeBox({x1: BORDER, y1: BORDER});
+    b = new Box(BORDER, BORDER);
     b.draw = tree(p, b);
     calcBounds();
   };

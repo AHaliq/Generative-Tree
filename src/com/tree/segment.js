@@ -1,189 +1,114 @@
-/**
- * decorate a segment object with behaviours
- * @param {SegBase} s
- */
-export function wrapSegBehaviour(s) {
-  const behaviours = [];
-  Object.defineProperties(s, {
-    addBehaviour: {
-      value: function(b) {
-        behaviours.push(b);
-      },
-    },
-    step: {
-      value: function() {
-        behaviours.map((x) => x(s));
-      },
-    },
-  });
+export default class Seg {
+  constructor(p, a, m, r) {
+    this._p = p;
+    this.children = [];
+    this._d = new Vec(p, a, m, false);
+    this._w = new Vec(p, a + p.HALF_PI, r, false);
+  }
+  set a(v) {
+    this._d.a = v;
+    this._w.a = v + this._p.HALF_PI;
+  }
+  get a() {
+    return this._d.a;
+  }
+  set l(v) {
+    this._d.m = v;
+  }
+  get l() {
+    return this._d.m;
+  }
+  set r(v) {
+    this._w.m = v;
+  }
+  get r() {
+    return this._w.m;
+  }
+  step(ox, oy, cumA) {
+    this.a += cumA;
+    const tx = ox + this._d.x;
+    const ty = oy + this._d.y;
+    const rwx = ox + this._w.x;
+    const rwy = oy + this._w.y;
+    const lwx = ox - this._w.x;
+    const lwy = oy - this._w.y;
+    this._algo(ox, oy, tx, ty, rwx, rwy, lwx, lwy);
+    this.children.map((x) => x.step(tx, ty, this.a));
+    this._palgo(ox, oy, tx, ty, rwx, rwy, lwx, lwy);
+    this.a -= cumA;
+  }
+  /** To be shadowed by subclasses */
+  _algo(ox, oy, tx, ty, rwx, rwy, lwx, lwy) {
+
+  }
+  _palgo(ox, oy, tx, ty, rwx, rwy, lwx, lwy) {
+
+  }
 }
 
-/**
- * Helper shortcut to create SegBaseW
- * @param {p5js} p
- * @param {Number} x origin x
- * @param {Number} y origin y
- * @param {Number} a displacement angle
- * @param {Number} m displacement magnitude
- * @param {Number} r wing radius
- * @return {SegBaseW}
- */
-export function makeSegBaseW(p, x, y, a, m, r) {
-  return wrapSegBaseW(makeSegBase(p, x, y, a, m), r);
-}
-
-/**
- * wraps a SegBase object with wing vectors
- * @param {SegBase} s
- * @param {Number} r
- * @return {SegBaseW}
- */
-export function wrapSegBaseW(s, r) {
-  const p = s._p;
-  const _w = makeVec(p, 0, r, false);
-  let _rw; let _lw = {};
-  let rchanged = true;
-  const updateW = function() {
-    if (s._tcheck() || rchanged) {
-      _w.a = s.d.a + p.HALF_PI;
-      _rw = {x: s.o.x + _w.x, y: s.o.y + _w.y};
-      _lw = {x: s.o.x - _w.x, y: s.o.y - _w.y};
-      rchanged = false;
-    }
-  };
-  Object.defineProperties(s, {
-    rw: {
-      get: function() {
-        s._updateT();
-        updateW();
-        return _rw;
-      },
-    },
-    lw: {
-      get: function() {
-        s._updateT();
-        updateW();
-        return _lw;
-      },
-    },
-    r: {
-      set: function(v) {
-        _w.m = v;
-        rchanged = true;
-      },
-      get: function() {
-        return _w.m;
-      },
-    },
-  });
-  return s;
-}
-
-/**
- * makes a segment object; origin and target point
- * @param {p5js} p p5js argument object
- * @param {Number} x origin x
- * @param {Number} y origin y
- * @param {Number} a displacement angle
- * @param {Number} m displacement magnitude
- * @return {SegBase}
- */
-export function makeSegBase(p, x, y, a, m) {
-  const _o = makeVec(p, x, y);
-  const _d = makeVec(p, a, m, false);
-  const _t = makeVec(p);
-  /** updates target point */
-  function __updateT() {
-    if (_o.check() || _d.check()) {
-      _t.x = _o.x + _d.x;
-      _t.y = _o.y + _d.y;
+export class Vec {
+  constructor(p, v1 = 0, v2 = 0, cartesian = true) {
+    this._p = p;
+    this._upCar = !cartesian;
+    this._upAng = cartesian;
+    this._upMag = cartesian;
+    this._changed = true;
+    this._x = cartesian ? v1 : 0;
+    this._y = cartesian ? v2 : 0;
+    this._a = cartesian ? 0 : v1;
+    this._m = cartesian ? 0 : v2;
+  }
+  _updateCartesian() {
+    if (this._upCar) {
+      this._x = this._p.cos(this._a) * this._m;
+      this._y = this._p.sin(this._a) * this._m;
+      this._upCar = false;
     }
   }
-  return {
-    _p: p,
-    _updateT: __updateT,
-    _tcheck: _t.check,
-    get o() {
-      return _o;
-    },
-    get d() {
-      return _d;
-    },
-    get t() {
-      __updateT();
-      return {x: _t.x, y: _t.y};
-    },
-  };
-}
-
-/**
- * makes a vector object
- * @param {p5js} p p5js argument object
- * @param {Number} v1 x or angle
- * @param {Number} v2 y or magnitude
- * @param {Boolean} cartesian determines the quantity v1 and v2 represents
- * @return {Vec} vector object
- */
-export function makeVec(p, v1 = 0, v2 = 0, cartesian = true) {
-  let upCar = !cartesian;
-  let upAng = cartesian;
-  let upMag = cartesian;
-  let changed = true;
-  let _x = cartesian ? v1 : 0;
-  let _y = cartesian ? v2 : 0;
-  let _a = cartesian ? 0 : v1;
-  let _m = cartesian ? 0 : v2;
-  return {
-    get x() {
-      if (upCar) {
-        _x = p.cos(_a) * _m;
-        _y = p.sin(_a) * _m;
-        upCar = false;
-      }
-      return _x;
-    },
-    set x(v) {
-      _x = v;
-      upAng = upMag = changed = true;
-    },
-    get y() {
-      if (upCar) {
-        _x = p.cos(_a) * _m;
-        _y = p.sin(_a) * _m;
-        upCar = false;
-      }
-      return _y;
-    },
-    set y(v) {
-      _y = v;
-      upAng = upMag = changed = true;
-    },
-    get a() {
-      if (upAng) {
-        _a = p.atan2(_y, _x);
-        upAng = false;
-      }
-      return _a;
-    },
-    set a(v) {
-      _a = v;
-      upCar = changed = true;
-    },
-    get m() {
-      if (upMag) {
-        _m = p.sqrt(_x * _x + _y * _y);
-        upMag = false;
-      }
-      return _m;
-    },
-    set m(v) {
-      _m = v;
-      upCar = changed = true;
-    },
-    check: function() {
-      const s = changed;
-      changed = false;
-      return s;
-    },
-  };
+  get x() {
+    this._updateCartesian();
+    return this._x;
+  }
+  set x(v) {
+    this._x = v;
+    this._upAng = this._upMag = this._changed = true;
+  }
+  get y() {
+    this._updateCartesian();
+    return this._y;
+  }
+  set y(v) {
+    this._y = v;
+    this._upAng = this._upMag = this._changed = true;
+  }
+  get a() {
+    if (this._upAng) {
+      this._a = this._p.atan2(this._y, this._x);
+      this._upAng = false;
+    }
+    return this._a;
+  }
+  set a(v) {
+    this._a = v;
+    this._upCar = this._changed = true;
+  }
+  get m() {
+    if (this._upMag) {
+      this._m = this._p.sqrt(this._x * this._x + this._y * this._y);
+      this._upMag = false;
+    }
+    return this._m;
+  }
+  set m(v) {
+    this._m = v;
+    this._upCar = this._changed = true;
+  }
+  check() {
+    const s = this._changed;
+    this._changed = false;
+    return s;
+  }
+  static add(v1, v2) {
+    return new Vec(v1._p, v1.x + v2.x, v1.y + v2.y);
+  }
 }
