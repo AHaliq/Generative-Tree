@@ -9,6 +9,8 @@ import Seg from './segment';
 export default function (p, b) {
   const s = new NoiseSeg(p, 0, 10, 25, {
     COUNT: 7000,
+    FLOWER_PROB: 0.8,
+    FLOWERS: []
   });
 
   return function () {
@@ -17,6 +19,11 @@ export default function (p, b) {
     p.beginShape();
     s.step(b.o1.x + b.width * 0.5, b.o2.y, p.radians(-90), b);
     p.endShape();
+    s.so.FLOWERS.map((x) => {
+      x.c += (1 - x.c) * x.rate;
+      p.fill(...x.col);
+      p.ellipse(x.x, x.y, x.c * x.r);
+    })
   };
 };
 
@@ -116,6 +123,20 @@ class NoiseSeg extends Seg {
               }));
           }
         }
+        this.growthState = this.children.length == 0 ? 3 : 2;
+        break;
+      case 3:
+        if (p.random() < this.so.FLOWER_PROB) {
+          this.so.FLOWERS.push({
+            x: tx,
+            y: ty,
+            c: 0,
+            r: p.random(2, 4),
+            rate: p.random(0.001, 0.05),
+            col: [255, 100, 100].map(v => v * (0.5 + p.random()))
+          })
+        }
+        //spawn flower
         this.growthState = 2;
         break;
     }
@@ -129,6 +150,6 @@ class NoiseSeg extends Seg {
     p.vertex(rwx, rwy);
   }
 }
-//TODO flower
+//TODO wilt and shrink tree
 
 //TODO make noise pen plotter box
