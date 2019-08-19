@@ -7,7 +7,8 @@ module.exports = {
   entry: path.join(__dirname, '../src/com/sketch.js'),
   output: {
     path: path.resolve(path.join(__dirname, '../'), 'dist'),
-    filename: 'main-[chunkhash].js'
+    filename: 'main-[chunkhash].js',
+    publicPath: "/Generative-Tree/"
   },
   module: {
     rules: [
