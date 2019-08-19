@@ -8,16 +8,14 @@ import Seg from './segment';
  */
 export default function (p, b) {
   const s = new NoiseSeg(p, 0, 10, 25, {
-    GROWTH_RATE: 0.1,
     COUNT: 7000,
   });
 
   return function () {
-    p.translate(b.o1.x + b.width * 0.5, b.o2.y);
     p.fill(150);
     p.noStroke();
     p.beginShape();
-    s.step(0, 0, p.radians(-90));
+    s.step(b.o1.x + b.width * 0.5, b.o2.y, p.radians(-90), b);
     p.endShape();
   };
 };
@@ -25,7 +23,7 @@ export default function (p, b) {
 class NoiseSeg extends Seg {
   constructor(p, a, m, r, so, {
     growthRate = 1,
-    growSpread = 20,
+    growSpread = 18,
     branchRate = 0.05,
     branchSpread = 45
   } = {}) {
@@ -40,8 +38,13 @@ class NoiseSeg extends Seg {
     this.targetR = r;
     this.so = so;
   }
-  _algo(ox, oy, tx, ty, rwx, rwy, lwx, lwy) {
+  wrapAngle(x) {
     const p = this._p;
+    return x - 2 * p.PI * p.floor(x / (2 * p.PI) + 0.5);
+  }
+  step(ox, oy, cumA, b) {
+    const p = this._p;
+    let { tx, ty, rwx, rwy, lwx, lwy } = this.getCoords(ox, oy, cumA);
 
     switch (this.growthState) {
       case 0:
@@ -52,6 +55,49 @@ class NoiseSeg extends Seg {
         }
         this.l = this.growth * this.targetL;
         this.r = this.growth * this.targetR;
+        ({ tx, ty, rwx, rwy, lwx, lwy } = this.getCoords(ox, oy, cumA));
+        // grow
+
+        if (tx < b.o1.x) {
+          const fa = this.wrapAngle(this.a + cumA);
+          const dx = b.o1.x - ox;
+          const dy = p.sqrt(this.l * this.l - dx * dx);
+          this._d.x = dx;
+          this._d.y = fa > 0 ? dy : -dy;
+          this.a -= cumA;
+          ({ tx, ty, rwx, rwy, lwx, lwy } = this.getCoords(ox, oy, cumA));
+        }
+
+        if (tx > b.o2.x) {
+          const fa = this.wrapAngle(this.a + cumA);
+          const dx = b.o2.x - ox;
+          const dy = p.sqrt(this.l * this.l - dx * dx);
+          this._d.x = dx;
+          this._d.y = fa > 0 ? dy : -dy;
+          this.a -= cumA;
+          ({ tx, ty, rwx, rwy, lwx, lwy } = this.getCoords(ox, oy, cumA));
+        }
+
+        if (ty < b.o1.y) {
+          let fa = this.wrapAngle(this.a + cumA + p.HALF_PI);
+          const dy = b.o1.y - oy;
+          const dx = p.sqrt(this.l * this.l - dy * dy);
+          this._d.y = dy;
+          this._d.x = fa > 0 ? dx : -dx;
+          this.a -= cumA;
+          ({ tx, ty, rwx, rwy, lwx, lwy } = this.getCoords(ox, oy, cumA));
+        }
+
+        if (ty > b.o2.y) {
+          let fa = this.wrapAngle(this.a + cumA + p.HALF_PI);
+          const dy = b.o2.y - oy;
+          const dx = p.sqrt(this.l * this.l - dy * dy);
+          this._d.y = dy;
+          this._d.x = fa > 0 ? dx : -dx;
+          this.a -= cumA;
+          ({ tx, ty, rwx, rwy, lwx, lwy } = this.getCoords(ox, oy, cumA));
+        }
+        // bounds
         break;
       case 1:
         if (this.so.COUNT-- > 0) {
@@ -63,10 +109,10 @@ class NoiseSeg extends Seg {
               p,
               p.radians(p.random(-1, 1) * sprd),
               this.targetL,
-              this.targetR + (0.5 - this.targetR) * 0.12,
+              this.targetR + (0.1 - this.targetR) * 0.12,
               this.so,
               {
-                branchRate: this.branchRate * 1.05
+                branchRate: this.branchRate + (0.25 - this.branchRate) * 0.075//* 1.065
               }));
           }
         }
@@ -77,10 +123,12 @@ class NoiseSeg extends Seg {
     p.vertex(lwx, lwy);
     if (this.children.length == 0) {
       p.vertex(tx, ty);
+    } else {
+      this.children.map((x) => x.step(tx, ty, this.a + cumA, b));
     }
-  }
-  _palgo(ox, oy, tx, ty, rwx, rwy, lwx, lwy) {
-    const p = this._p;
     p.vertex(rwx, rwy);
   }
 }
+//TODO flower
+
+//TODO make noise pen plotter box

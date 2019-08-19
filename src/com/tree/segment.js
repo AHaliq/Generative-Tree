@@ -24,24 +24,20 @@ export default class Seg {
   get r() {
     return this._w.m;
   }
-  step(ox, oy, cumA) {
+  getCoords(ox, oy, cumA) {
     this.a += cumA;
-    const tx = ox + this._d.x;
-    const ty = oy + this._d.y;
-    const rwx = ox + this._w.x;
-    const rwy = oy + this._w.y;
-    const lwx = ox - this._w.x;
-    const lwy = oy - this._w.y;
-    this._algo(ox, oy, tx, ty, rwx, rwy, lwx, lwy);
-    this.children.map((x) => x.step(tx, ty, this.a));
-    this._palgo(ox, oy, tx, ty, rwx, rwy, lwx, lwy);
+    const obj = {
+      tx: ox + this._d.x,
+      ty: oy + this._d.y,
+      rwx: ox + this._w.x,
+      rwy: oy + this._w.y,
+      lwx: ox - this._w.x,
+      lwy: oy - this._w.y
+    }
     this.a -= cumA;
+    return obj;
   }
-  /** To be shadowed by subclasses */
-  _algo(ox, oy, tx, ty, rwx, rwy, lwx, lwy) {
-
-  }
-  _palgo(ox, oy, tx, ty, rwx, rwy, lwx, lwy) {
+  step(ox, oy, cumA) {
 
   }
 }
