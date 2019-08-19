@@ -12,13 +12,6 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.html$/,
-        use: {
-          loader: "html-loader",
-          options: { minimize: false }
-        }
-      },
-      {
         test: /\.scss$/,
         use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"]
       }
