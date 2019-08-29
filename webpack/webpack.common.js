@@ -7,8 +7,7 @@ module.exports = {
   entry: path.join(__dirname, '../src/com/sketch.js'),
   output: {
     path: path.resolve(path.join(__dirname, '../'), 'dist'),
-    filename: 'main-[chunkhash].js',
-    publicPath: "/Generative-Tree/"
+    filename: 'main-[contenthash].js'
   },
   module: {
     rules: [
@@ -23,6 +22,6 @@ module.exports = {
       template: "./src/index.html"
     }),
     new WebpackCleanupPlugin(),
-    new MiniCssExtractPlugin({ filename: "[name].[contentHash].css" })
+    new MiniCssExtractPlugin({ filename: "[name].[hash].css" })
   ]
 }
